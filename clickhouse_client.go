@@ -48,25 +48,7 @@ func NewClient(cfg Config) (clickhouse.Conn, error) {
 		return nil, fmt.Errorf("failed to connect to clickhouse: %w", err)
 	}
 
-	client := &ClickHouseClient{
-		conn:   conn,
-		config: config,
-		logger: func(format string, args ...interface{}) {
-			fmt.Printf("[ClickHouse] "+format+"\n", args...)
-		},
-	}
-
-	// Проверяем подключение
-	if err := client.Ping(context.Background()); err != nil {
-		conn.Close()
-		return nil, fmt.Errorf("не удалось проверить подключение к ClickHouse: %w", err)
-	}
-
-	if err := initTables(context.Background(), conn); err != nil {
-		return nil, fmt.Errorf("error initializing tables: %w", err)
-	}
-
-	return client, nil
+	return conn, nil
 }
 
 // SetLogger устанавливает функцию логирования
@@ -84,15 +66,7 @@ func (c *ClickHouseClient) Close() error {
 	return c.conn.Close()
 }
 
-// initTables инициализирует таблицы
-func initTables(ctx context.Context, conn driver.Conn) error {
-	// Создаем базу данных для данных Cronos
-	sql := "CREATE DATABASE IF NOT EXISTS cronos_data"
-	if err := conn.Exec(ctx, sql); err != nil {
-		return fmt.Errorf("failed to create database: %w", err)
-	}
-	return nil
-}
+
 
 // CreateTableFromCronos создает таблицу в ClickHouse на основе структуры Cronos
 func (c *ClickHouseClient) CreateTableFromCronos(ctx context.Context, folderName string, cronosTable *CronosTable) error {
