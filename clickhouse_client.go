@@ -23,37 +23,29 @@ type ClickHouseClient struct {
 	logger func(format string, args ...interface{})
 }
 
-// NewClickHouseClient создает новое подключение к ClickHouse
-func NewClickHouseClient(config *Config) (*ClickHouseClient, error) {
+// NewClient создает новое подключение к ClickHouse
+func NewClient(cfg Config) (clickhouse.Conn, error) {
 	conn, err := clickhouse.Open(&clickhouse.Options{
-		Addr: config.GetClickHouseAddr(),
+		Addr: []string{"192.168.0.210:9000"},
 		Auth: clickhouse.Auth{
-			Database: config.ClickHouseDatabase,
-			Username: config.ClickHouseUser,
-			Password: config.ClickHousePassword,
+			Database: "default",
+			Username: "default",
+			Password: "default",
 		},
 		ClientInfo: clickhouse.ClientInfo{
 			Products: []struct {
 				Name    string
 				Version string
 			}{
-				{Name: "cronodamp-go-client", Version: "1.0"},
+				{Name: "an-example-go-client", Version: "0.1"},
 			},
 		},
 		Debugf: func(format string, v ...interface{}) {
-			fmt.Printf("[ClickHouse Debug] "+format+"\n", v...)
+			fmt.Printf(format, v...)
 		},
-		Settings: clickhouse.Settings{
-			"max_execution_time": 60,
-		},
-		DialTimeout:      time.Second * 30,
-		MaxOpenConns:     5,
-		MaxIdleConns:     5,
-		ConnMaxLifetime:  time.Hour,
-		ConnOpenStrategy: clickhouse.ConnOpenInOrder,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("не удалось подключиться к ClickHouse: %w", err)
+		return nil, fmt.Errorf("failed to connect to clickhouse: %w", err)
 	}
 
 	client := &ClickHouseClient{
@@ -70,10 +62,8 @@ func NewClickHouseClient(config *Config) (*ClickHouseClient, error) {
 		return nil, fmt.Errorf("не удалось проверить подключение к ClickHouse: %w", err)
 	}
 
-	// Создаем базу данных если не существует
-	if err := client.initDatabase(context.Background()); err != nil {
-		conn.Close()
-		return nil, fmt.Errorf("не удалось инициализировать базу данных: %w", err)
+	if err := initTables(context.Background(), conn); err != nil {
+		return nil, fmt.Errorf("error initializing tables: %w", err)
 	}
 
 	return client, nil
@@ -94,11 +84,14 @@ func (c *ClickHouseClient) Close() error {
 	return c.conn.Close()
 }
 
-// initDatabase создает базу данных если не существует
-func (c *ClickHouseClient) initDatabase(ctx context.Context) error {
-	sql := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s`", c.config.ClickHouseDatabase)
-	c.logger("Создание базы данных: %s", c.config.ClickHouseDatabase)
-	return c.conn.Exec(ctx, sql)
+// initTables инициализирует таблицы
+func initTables(ctx context.Context, conn driver.Conn) error {
+	// Создаем базу данных для данных Cronos
+	sql := "CREATE DATABASE IF NOT EXISTS cronos_data"
+	if err := conn.Exec(ctx, sql); err != nil {
+		return fmt.Errorf("failed to create database: %w", err)
+	}
+	return nil
 }
 
 // CreateTableFromCronos создает таблицу в ClickHouse на основе структуры Cronos
