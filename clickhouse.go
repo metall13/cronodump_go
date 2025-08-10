@@ -45,10 +45,10 @@ func NewClickHouseClient(cfg Config) (*ClickHouseClient, error) {
 		cfg:  cfg,
 	}
 
-	// Проверяем подключение
-	if err := client.Ping(context.Background()); err != nil {
-		return nil, fmt.Errorf("не удалось проверить подключение к ClickHouse: %w", err)
-	}
+	// Проверяем подключение (опционально)
+	// if err := client.Ping(context.Background()); err != nil {
+	//	return nil, fmt.Errorf("не удалось проверить подключение к ClickHouse: %w", err)
+	// }
 
 	return client, nil
 }
