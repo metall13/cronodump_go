@@ -28,9 +28,9 @@ func NewClickHouseClient(config *Config) (*ClickHouseClient, error) {
 	conn, err := clickhouse.Open(&clickhouse.Options{
 		Addr: config.GetClickHouseAddr(),
 		Auth: clickhouse.Auth{
-			Database: config.ClickHouseDatabase,
-			Username: config.ClickHouseUser,
-			Password: config.ClickHousePassword,
+			Database: "default",
+			Username: "default",
+			Password: "default",
 		},
 		ClientInfo: clickhouse.ClientInfo{
 			Products: []struct {
@@ -98,6 +98,7 @@ func (c *ClickHouseClient) Close() error {
 
 // initDatabase создает базу данных если не существует
 func (c *ClickHouseClient) initDatabase(ctx context.Context) error {
+	// Подключаемся к default базе, но создаем нашу рабочую базу
 	sql := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s`", c.config.ClickHouseDatabase)
 	c.logger("Создание базы данных: %s", c.config.ClickHouseDatabase)
 	return c.conn.Exec(ctx, sql)

@@ -32,7 +32,7 @@ func LoadConfigFromEnv() (*Config, error) {
 		// Значения по умолчанию
 		ClickHouseDatabase: "cronos_data",
 		ClickHouseUser:     "default",
-		ClickHousePassword: "default",
+		ClickHousePassword: "",
 		BatchSize:          1000,
 		Verbose:            false,
 	}

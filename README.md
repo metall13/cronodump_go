@@ -54,8 +54,12 @@ go build -o cronos-converter
 export CRONOS_DB_PATH="/home/usersamba/smb/"
 export CLICKHOUSE_DSN="localhost:9000"
 export CLICKHOUSE_DATABASE="cronos_data"
+export CLICKHOUSE_USER="default"
+export CLICKHOUSE_PASSWORD=""
 export VERBOSE="true"
 ```
+
+**Примечание:** Программа подключается к базе данных `default` в ClickHouse, но создает и использует рабочую базу данных, указанную в `CLICKHOUSE_DATABASE`.
 
 ## Использование
 
@@ -70,6 +74,12 @@ export VERBOSE="true"
 
 ```bash
 go run .
+```
+
+Для удобства также можно использовать готовый скрипт:
+
+```bash
+./example.sh
 ```
 
 ## Структура данных
