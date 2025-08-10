@@ -89,6 +89,7 @@ func LoadConfigFromEnv() (*Config, error) {
 }
 
 // GetClickHouseAddr возвращает адрес ClickHouse в формате для драйвера
+// Примечание: В текущей версии используется прямое обращение к config.ClickHouseAddr
 func (c *Config) GetClickHouseAddr() []string {
 	// Поддерживаем как один адрес, так и список через запятую
 	addresses := strings.Split(c.ClickHouseAddr, ",")

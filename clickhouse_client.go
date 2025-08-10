@@ -26,7 +26,7 @@ type ClickHouseClient struct {
 // NewClickHouseClient создает новое подключение к ClickHouse
 func NewClickHouseClient(config *Config) (*ClickHouseClient, error) {
 	conn, err := clickhouse.Open(&clickhouse.Options{
-		Addr: config.GetClickHouseAddr(),
+		Addr: []string{config.ClickHouseAddr},
 		Auth: clickhouse.Auth{
 			Database: "default",
 			Username: "default",
