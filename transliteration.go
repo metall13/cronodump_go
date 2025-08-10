@@ -172,7 +172,7 @@ func avoidReservedWords(name string) string {
 		"when": true, "then": true, "else": true, "end": true,
 		"if": true, "exists": true, "between": true, "like": true,
 		"in": true, "is": true, "distinct": true, "all": true,
-		"any": true, "some": true, "exists": true, "primary": true,
+		"any": true, "some": true, "primary": true,
 		"key": true, "foreign": true, "references": true, "check": true,
 		"constraint": true, "default": true, "auto_increment": true,
 		"engine": true, "partition": true, "settings": true,
