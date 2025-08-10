@@ -1,0 +1,22 @@
+{
+  "database_path": "/path/to/kronos.fdb",
+  "output_path": "./output",
+  "clickhouse_host": "localhost",
+  "clickhouse_port": 9000,
+  "clickhouse_database": "default",
+  "clickhouse_username": "default",
+  "clickhouse_password": "",
+  "clickhouse_ssl": false,
+  "batch_size": 1000,
+  "max_connections": 5,
+  "enable_logging": true,
+  "log_level": "INFO",
+  "include_tables": [],
+  "exclude_tables": [],
+  "include_views": true,
+  "include_indexes": false,
+  "transliterate_names": true,
+  "lowercase_names": true,
+  "max_memory_usage": 1073741824,
+  "connection_timeout": 30
+}
