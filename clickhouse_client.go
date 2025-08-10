@@ -37,7 +37,7 @@ func NewClickHouseClient(config *Config) (*ClickHouseClient, error) {
 				Name    string
 				Version string
 			}{
-				{Name: "cronos-converter-go", Version: "1.0"},
+				{Name: "cronodamp-go-client", Version: "1.0"},
 			},
 		},
 		Debugf: func(format string, v ...interface{}) {

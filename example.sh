@@ -8,7 +8,7 @@ echo "=== Настройка переменных окружения ==="
 
 # Обязательные переменные
 export CRONOS_DB_PATH="/home/usersamba/smb/"
-export CLICKHOUSE_DSN="localhost:9000"
+export CLICKHOUSE_DSN="127.0.0.1:9000"
 
 # Дополнительные настройки (опционально)
 export CLICKHOUSE_DATABASE="cronos_data"

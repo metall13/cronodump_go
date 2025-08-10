@@ -52,7 +52,7 @@ go build -o cronos-converter
 
 ```bash
 export CRONOS_DB_PATH="/home/usersamba/smb/"
-export CLICKHOUSE_DSN="localhost:9000"
+export CLICKHOUSE_DSN="127.0.0.1:9000"
 export CLICKHOUSE_DATABASE="cronos_data"
 export CLICKHOUSE_USER="default"
 export CLICKHOUSE_PASSWORD=""
