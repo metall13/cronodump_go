@@ -1,0 +1,13 @@
+{
+  "kronos_databases_path": "../cronodump/test_data",
+  "clickhouse_url": "",
+  "output_path": "./output",
+  "clickhouse": {
+    "host": "localhost",
+    "port": 9000,
+    "database": "kronos_data",
+    "username": "default",
+    "password": "",
+    "ssl": false
+  }
+}
