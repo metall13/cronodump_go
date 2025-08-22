@@ -1,0 +1,12 @@
+{
+  "database_path": "/home/bd_cronos",
+  "output_path": "cronos-export",
+  "clickhouse": {
+    "host": "localhost",
+    "port": 9000,
+    "database": "default",
+    "username": "default",
+    "password": "",
+    "connection_string": ""
+  }
+}
