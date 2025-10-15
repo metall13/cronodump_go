@@ -47,7 +47,7 @@ RUN mkdir -p /tmp/cronodump && \
 USER appuser
 
 # Открываем порт
-EXPOSE 8080
+EXPOSE 9999
 
 # Устанавливаем переменные окружения по умолчанию
 ENV LOG_LEVEL=info

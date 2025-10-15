@@ -55,7 +55,7 @@ make start-service
 
 ### Веб-интерфейс
 
-1. Откройте браузер и перейдите по адресу `http://localhost:8080`
+1. Откройте браузер и перейдите по адресу `http://localhost:9999`
 2. Добавьте базы данных для обработки
 3. Нажмите "Начать обработку"
 4. Следите за прогрессом в реальном времени
@@ -66,7 +66,7 @@ make start-service
 #### Тестирование подключения к базе данных
 
 ```bash
-curl -X POST http://localhost:8080/api/databases/test \
+curl -X POST http://localhost:9999/api/databases/test \
   -H "Content-Type: application/json" \
   -d '{
     "name": "test_db",
@@ -82,7 +82,7 @@ curl -X POST http://localhost:8080/api/databases/test \
 #### Получение списка таблиц
 
 ```bash
-curl -X POST http://localhost:8080/api/databases/tables \
+curl -X POST http://localhost:9999/api/databases/tables \
   -H "Content-Type: application/json" \
   -d '{
     "name": "test_db",
@@ -98,7 +98,7 @@ curl -X POST http://localhost:8080/api/databases/tables \
 #### Запуск обработки
 
 ```bash
-curl -X POST http://localhost:8080/api/process \
+curl -X POST http://localhost:9999/api/process \
   -H "Content-Type: application/json" \
   -d '{
     "databases": [
@@ -119,13 +119,13 @@ curl -X POST http://localhost:8080/api/process \
 #### Получение статуса задачи
 
 ```bash
-curl http://localhost:8080/api/jobs/{jobId}
+curl http://localhost:9999/api/jobs/{jobId}
 ```
 
 #### Скачивание результата
 
 ```bash
-curl http://localhost:8080/api/jobs/{jobId}/download -o result.csv
+curl http://localhost:9999/api/jobs/{jobId}/download -o result.csv
 ```
 
 ## Конфигурация
