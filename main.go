@@ -34,6 +34,6 @@ func main() {
 	router := apiHandler.SetupRoutes()
 
 	// Запуск сервера
-	logger.Info("Запуск сервера на порту :8080")
-	log.Fatal(http.ListenAndServe(":8080", router))
+	logger.Info("Запуск сервера на порту :3000")
+	log.Fatal(http.ListenAndServe(":3000", router))
 }
