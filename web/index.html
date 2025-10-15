@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cronodump Go - Обработка баз данных</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Cronodump Go</h1>
+            <p>Обработка и объединение баз данных с транслитерацией для ClickHouse</p>
+        </header>
+
+        <main>
+            <!-- Форма добавления баз данных -->
+            <section class="database-form">
+                <h2>Добавить базы данных</h2>
+                <form id="databaseForm">
+                    <div class="form-group">
+                        <label for="dbName">Название базы данных:</label>
+                        <input type="text" id="dbName" name="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dbType">Тип базы данных:</label>
+                        <select id="dbType" name="type" required>
+                            <option value="postgres">PostgreSQL</option>
+                            <option value="mysql">MySQL</option>
+                            <option value="clickhouse">ClickHouse</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dbHost">Хост:</label>
+                            <input type="text" id="dbHost" name="host" value="localhost" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="dbPort">Порт:</label>
+                            <input type="number" id="dbPort" name="port" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dbDatabase">Имя базы данных:</label>
+                        <input type="text" id="dbDatabase" name="database" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dbUsername">Пользователь:</label>
+                            <input type="text" id="dbUsername" name="username" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="dbPassword">Пароль:</label>
+                            <input type="password" id="dbPassword" name="password">
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" id="testConnectionBtn" class="btn btn-secondary">Тестировать подключение</button>
+                        <button type="button" id="addDatabaseBtn" class="btn btn-primary">Добавить базу данных</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Список добавленных баз данных -->
+            <section class="databases-list">
+                <h2>Добавленные базы данных</h2>
+                <div id="databasesList" class="databases-grid">
+                    <!-- Базы данных будут добавлены динамически -->
+                </div>
+            </section>
+
+            <!-- Кнопка запуска обработки -->
+            <section class="process-section">
+                <button id="startProcessBtn" class="btn btn-success btn-large" disabled>
+                    Начать обработку
+                </button>
+            </section>
+
+            <!-- Прогресс обработки -->
+            <section class="progress-section" id="progressSection" style="display: none;">
+                <h2>Прогресс обработки</h2>
+                <div class="progress-info">
+                    <div class="progress-item">
+                        <span class="label">Найдено баз данных:</span>
+                        <span class="value" id="databasesFound">0</span>
+                    </div>
+                    <div class="progress-item">
+                        <span class="label">Обработано баз данных:</span>
+                        <span class="value" id="databasesProcessed">0</span>
+                    </div>
+                    <div class="progress-item">
+                        <span class="label">Найдено таблиц:</span>
+                        <span class="value" id="tablesFound">0</span>
+                    </div>
+                    <div class="progress-item">
+                        <span class="label">Обработано таблиц:</span>
+                        <span class="value" id="tablesProcessed">0</span>
+                    </div>
+                    <div class="progress-item">
+                        <span class="label">Обработано записей:</span>
+                        <span class="value" id="recordsProcessed">0</span>
+                    </div>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                
+                <div class="progress-text" id="progressText">Ожидание...</div>
+            </section>
+
+            <!-- Логи -->
+            <section class="logs-section">
+                <h2>Последние логи</h2>
+                <div id="logsContainer" class="logs-container">
+                    <!-- Логи будут добавлены динамически -->
+                </div>
+            </section>
+
+            <!-- Список задач -->
+            <section class="jobs-section">
+                <h2>История задач</h2>
+                <div id="jobsList" class="jobs-list">
+                    <!-- Задачи будут добавлены динамически -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

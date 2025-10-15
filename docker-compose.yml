@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  cronodump-go:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - LOG_LEVEL=info
+      - TEMP_DIR=/tmp/cronodump
+      - MAX_FILE_SIZE=104857600
+    volumes:
+      - ./temp:/tmp/cronodump
+    restart: unless-stopped
+    networks:
+      - cronodump-network
+
+  # Пример PostgreSQL для тестирования
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=testdb
+      - POSTGRES_USER=testuser
+      - POSTGRES_PASSWORD=testpass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - cronodump-network
+
+  # Пример MySQL для тестирования
+  mysql:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpass
+      - MYSQL_DATABASE=testdb
+      - MYSQL_USER=testuser
+      - MYSQL_PASSWORD=testpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - cronodump-network
+
+  # Пример ClickHouse для тестирования
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    ports:
+      - "9000:9000"
+      - "8123:8123"
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+    networks:
+      - cronodump-network
+
+volumes:
+  postgres_data:
+  mysql_data:
+  clickhouse_data:
+
+networks:
+  cronodump-network:
+    driver: bridge
