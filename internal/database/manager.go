@@ -11,7 +11,7 @@ import (
 )
 
 type Manager struct {
-	logger *Logger
+	logger Logger
 }
 
 type DatabaseInfo struct {

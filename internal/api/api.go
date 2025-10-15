@@ -154,7 +154,23 @@ func (a *API) processDatabases(w http.ResponseWriter, r *http.Request) {
 	
 	// Запускаем обработку в отдельной горутине
 	go func() {
-		status, err := a.dataProcessor.ProcessDatabases(jobID, req.Databases, req.TempDir)
+		// Конвертируем database.DatabaseInfo в processor.DatabaseInfo
+		procDatabases := make([]processor.DatabaseInfo, len(req.Databases))
+		for i, db := range req.Databases {
+			procDatabases[i] = processor.DatabaseInfo{
+				ID:       db.ID,
+				Name:     db.Name,
+				Type:     db.Type,
+				Host:     db.Host,
+				Port:     db.Port,
+				Database: db.Database,
+				Username: db.Username,
+				Password: db.Password,
+				Status:   db.Status,
+				CreatedAt: db.CreatedAt,
+			}
+		}
+		status, err := a.dataProcessor.ProcessDatabases(jobID, procDatabases, req.TempDir)
 		if err != nil {
 			status.Status = "failed"
 			status.Error = err.Error()

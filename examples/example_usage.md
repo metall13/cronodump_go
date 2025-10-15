@@ -64,7 +64,7 @@ make run
 ### Тестирование подключения
 
 ```bash
-curl -X POST http://localhost:8080/api/databases/test \
+curl -X POST http://localhost:9999/api/databases/test \
   -H "Content-Type: application/json" \
   -d '{
     "name": "test_db",
@@ -80,7 +80,7 @@ curl -X POST http://localhost:8080/api/databases/test \
 ### Получение списка таблиц
 
 ```bash
-curl -X POST http://localhost:8080/api/databases/tables \
+curl -X POST http://localhost:9999/api/databases/tables \
   -H "Content-Type: application/json" \
   -d '{
     "name": "test_db",

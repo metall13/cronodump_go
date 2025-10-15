@@ -70,21 +70,21 @@ install: build
 install-service: install
 	@echo "Создание systemd сервиса..."
 	@sudo tee /etc/systemd/system/cronodump-go.service > /dev/null <<EOF
-[Unit]
-Description=Cronodump Go Service
-After=network.target
+	[Unit]
+	Description=Cronodump Go Service
+	After=network.target
 
-[Service]
-Type=simple
-User=root
-WorkingDirectory=/workspace
-ExecStart=/usr/local/bin/$(BINARY_NAME)
-Restart=always
-RestartSec=5
+	[Service]
+	Type=simple
+	User=root
+	WorkingDirectory=/workspace
+	ExecStart=/usr/local/bin/$(BINARY_NAME)
+	Restart=always
+	RestartSec=5
 
-[Install]
-WantedBy=multi-user.target
-EOF
+	[Install]
+	WantedBy=multi-user.target
+	EOF
 	@sudo systemctl daemon-reload
 	@sudo systemctl enable cronodump-go
 	@echo "Сервис создан и включен"
