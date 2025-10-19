@@ -6,7 +6,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 // CronosParser парсит файлы базы данных Cronos

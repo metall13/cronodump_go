@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
-	"strings"
 )
 
 func main() {
