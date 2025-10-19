@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
 )
 
 // ClickHouseExporter экспортирует данные в формат ClickHouse

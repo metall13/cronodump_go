@@ -39,48 +39,33 @@ func (c *CronosConverter) Convert() error {
 		fmt.Printf("Выходная папка: %s\n", c.config.OutputDir)
 	}
 
-	// 1. Парсим базу данных Cronos
-	database, err := c.parser.ParseDatabase(c.config.InputDir)
+	// 1. Находим все базы данных Cronos в папке и подпапках
+	databases, err := c.parser.FindCronosDatabases(c.config.InputDir)
 	if err != nil {
-		return fmt.Errorf("ошибка парсинга базы данных: %v", err)
+		return fmt.Errorf("ошибка поиска баз данных: %v", err)
 	}
 
-	// 2. Применяем транслитерацию к именам таблиц и полей
-	c.applyTransliteration(database)
-
-	// 3. Анализируем связи между таблицами
-	c.analyzeRelations(database)
-
-	// 4. Объединяем связанные таблицы
-	mergedTables, err := c.mergeRelatedTables(database)
-	if err != nil {
-		return fmt.Errorf("ошибка объединения таблиц: %v", err)
+	if len(databases) == 0 {
+		return fmt.Errorf("не найдено ни одной базы данных Cronos в папке %s", c.config.InputDir)
 	}
 
-	// 5. Создаем выходную папку
+	if c.verbose {
+		fmt.Printf("Найдено баз данных: %d\n", len(databases))
+	}
+
+	// 2. Создаем выходную папку
 	err = os.MkdirAll(c.config.OutputDir, 0755)
 	if err != nil {
 		return fmt.Errorf("ошибка создания выходной папки: %v", err)
 	}
 
-	// 6. Экспортируем в SQL файлы
-	for _, table := range mergedTables {
-		outputPath := filepath.Join(c.config.OutputDir, table.Name+".sql")
-		err = c.exporter.ExportToFile(&CronosDatabase{Tables: []CronosTable{table}}, outputPath)
-		if err != nil {
-			return fmt.Errorf("ошибка экспорта таблицы %s: %v", table.Name, err)
-		}
+	// 3. Обрабатываем все найденные базы данных
+	err = c.processAllDatabases(databases)
+	if err != nil {
+		return err
 	}
 
-	// 7. Импортируем в ClickHouse (если указан URL)
-	if c.config.ClickHouse != "" {
-		err = c.importToClickHouse(mergedTables)
-		if err != nil {
-			return fmt.Errorf("ошибка импорта в ClickHouse: %v", err)
-		}
-	}
-
-	// 8. Удаляем временные файлы (если включено)
+	// 4. Удаляем временные файлы (если включено)
 	if c.config.Cleanup {
 		err = c.cleanupTempFiles()
 		if err != nil && c.verbose {
@@ -90,8 +75,8 @@ func (c *CronosConverter) Convert() error {
 
 	duration := time.Since(startTime)
 	if c.verbose {
-		fmt.Printf("Конвертация завершена за %v\n", duration)
-		fmt.Printf("Обработано таблиц: %d\n", len(mergedTables))
+		fmt.Printf("\n=== Конвертация завершена за %v ===\n", duration)
+		fmt.Printf("Обработано баз данных: %d\n", len(databases))
 	}
 
 	return nil
@@ -269,4 +254,80 @@ func (c *CronosConverter) cleanupTempFiles() error {
 
 	// Удаляем SQL файлы
 	return os.RemoveAll(c.config.OutputDir)
+}
+
+// processAllDatabases обрабатывает все найденные базы данных
+func (c *CronosConverter) processAllDatabases(databases []string) error {
+	var allMergedTables []CronosTable
+	totalTables := 0
+
+	// Обрабатываем каждую найденную базу данных
+	for i, dbPath := range databases {
+		if c.verbose {
+			fmt.Printf("\n=== Обработка базы данных %d из %d: %s ===\n", i+1, len(databases), dbPath)
+		}
+
+		// Парсим базу данных
+		database, err := c.parser.ParseDatabase(dbPath)
+		if err != nil {
+			if c.verbose {
+				fmt.Printf("Предупреждение: ошибка парсинга базы %s: %v\n", dbPath, err)
+			}
+			continue
+		}
+
+		// Применяем транслитерацию к именам таблиц и полей
+		c.applyTransliteration(database)
+
+		// Анализируем связи между таблицами
+		c.analyzeRelations(database)
+
+		// Объединяем связанные таблицы
+		mergedTables, err := c.mergeRelatedTables(database)
+		if err != nil {
+			if c.verbose {
+				fmt.Printf("Предупреждение: ошибка объединения таблиц в базе %s: %v\n", dbPath, err)
+			}
+			continue
+		}
+
+		// Добавляем префикс имени базы к именам таблиц для избежания конфликтов
+		baseName := filepath.Base(dbPath)
+		for j := range mergedTables {
+			mergedTables[j].Name = fmt.Sprintf("%s_%s", baseName, mergedTables[j].Name)
+		}
+
+		// Экспортируем в SQL файлы
+		for _, table := range mergedTables {
+			outputPath := filepath.Join(c.config.OutputDir, table.Name+".sql")
+			err = c.exporter.ExportToFile(&CronosDatabase{Tables: []CronosTable{table}}, outputPath)
+			if err != nil {
+				if c.verbose {
+					fmt.Printf("Предупреждение: ошибка экспорта таблицы %s: %v\n", table.Name, err)
+				}
+				continue
+			}
+		}
+
+		allMergedTables = append(allMergedTables, mergedTables...)
+		totalTables += len(mergedTables)
+
+		if c.verbose {
+			fmt.Printf("Обработано таблиц в базе %s: %d\n", baseName, len(mergedTables))
+		}
+	}
+
+	// Импортируем в ClickHouse (если указан URL)
+	if c.config.ClickHouse != "" {
+		err := c.importToClickHouse(allMergedTables)
+		if err != nil {
+			return fmt.Errorf("ошибка импорта в ClickHouse: %v", err)
+		}
+	}
+
+	if c.verbose {
+		fmt.Printf("\n=== Итого обработано таблиц: %d ===\n", totalTables)
+	}
+
+	return nil
 }

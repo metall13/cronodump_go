@@ -20,6 +20,51 @@ func NewCronosParser(verbose bool) *CronosParser {
 	}
 }
 
+// FindCronosDatabases находит все базы данных Cronos в указанной папке и подпапках
+func (p *CronosParser) FindCronosDatabases(rootPath string) ([]string, error) {
+	var databases []string
+	
+	if p.verbose {
+		fmt.Printf("Поиск баз данных Cronos в: %s\n", rootPath)
+	}
+	
+	err := filepath.Walk(rootPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		
+		// Проверяем, является ли это папкой
+		if !info.IsDir() {
+			return nil
+		}
+		
+		// Проверяем наличие файлов CroStru.dat и CroBank.dat
+		struPath := filepath.Join(path, "CroStru.dat")
+		bankPath := filepath.Join(path, "CroBank.dat")
+		
+		if _, err := os.Stat(struPath); err == nil {
+			if _, err := os.Stat(bankPath); err == nil {
+				databases = append(databases, path)
+				if p.verbose {
+					fmt.Printf("  Найдена база данных: %s\n", path)
+				}
+			}
+		}
+		
+		return nil
+	})
+	
+	if err != nil {
+		return nil, fmt.Errorf("ошибка поиска баз данных: %v", err)
+	}
+	
+	if p.verbose {
+		fmt.Printf("Найдено баз данных: %d\n", len(databases))
+	}
+	
+	return databases, nil
+}
+
 // ParseDatabase парсит базу данных Cronos из указанной папки
 func (p *CronosParser) ParseDatabase(dbPath string) (*CronosDatabase, error) {
 	if p.verbose {
