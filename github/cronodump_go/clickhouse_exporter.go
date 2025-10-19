@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 )
 
 // ClickHouseExporter экспортирует данные в формат ClickHouse
@@ -130,27 +131,8 @@ func (e *ClickHouseExporter) generateCreateTableSQL(table CronosTable) string {
 
 // mapFieldType преобразует тип поля Cronos в тип ClickHouse
 func (e *ClickHouseExporter) mapFieldType(field CronosField) string {
-	switch field.Type {
-	case 0: // INTEGER PRIMARY KEY
-		return "UInt32"
-	case 1: // INTEGER
-		return "Int32"
-	case 2: // VARCHAR/TEXT
-		if field.Length > 0 && field.Length <= 65535 {
-			return "String"
-		}
-		return "String"
-	case 3: // TEXT (dictionary)
-		return "String"
-	case 4: // DATE
-		return "Nullable(Date)"
-	case 5: // TIMESTAMP
-		return "Nullable(DateTime)"
-	case 6: // FILE REFERENCE
-		return "String"
-	default:
-		return "String"
-	}
+	// Все поля в ClickHouse будут строками
+	return "String"
 }
 
 // generateInsertSQL генерирует SQL для вставки данных
@@ -203,26 +185,29 @@ func (e *ClickHouseExporter) formatValue(value interface{}, fieldType int) strin
 		return "NULL"
 	}
 
-	switch fieldType {
-	case 0, 1: // INTEGER
-		return fmt.Sprintf("%v", value)
-	case 4, 5: // DATE, TIMESTAMP
-		if str, ok := value.(string); ok && str != "" {
-			return fmt.Sprintf("'%s'", str)
+	// Все значения конвертируем в строки
+	str := fmt.Sprintf("%v", value)
+	
+	// Специальная обработка для дат (тип 4) - конвертируем в формат дд.мм.гггг
+	if fieldType == 4 { // DATE
+		if str != "" && str != "NULL" {
+			// Пытаемся распарсить дату и переформатировать
+			formattedDate := e.formatDateString(str)
+			if formattedDate != "" {
+				str = formattedDate
+			}
 		}
-		return "NULL"
-	default: // STRING types
-		str := fmt.Sprintf("%v", value)
-		// Экранируем одинарные кавычки
-		str = strings.ReplaceAll(str, "'", "''")
-		// Убираем управляющие символы
-		str = strings.ReplaceAll(str, "\n", "\\n")
-		str = strings.ReplaceAll(str, "\r", "\\r")
-		str = strings.ReplaceAll(str, "\t", "\\t")
-		str = strings.ReplaceAll(str, "\\", "\\\\")
-		
-		return fmt.Sprintf("'%s'", str)
 	}
+	
+	// Экранируем одинарные кавычки
+	str = strings.ReplaceAll(str, "'", "''")
+	// Убираем управляющие символы
+	str = strings.ReplaceAll(str, "\n", "\\n")
+	str = strings.ReplaceAll(str, "\r", "\\r")
+	str = strings.ReplaceAll(str, "\t", "\\t")
+	str = strings.ReplaceAll(str, "\\", "\\\\")
+	
+	return fmt.Sprintf("'%s'", str)
 }
 
 // ExportTableToFile экспортирует одну таблицу в уже открытый файл
