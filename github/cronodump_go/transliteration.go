@@ -21,7 +21,7 @@ func NewTransliterator() *Transliterator {
 func (t *Transliterator) Transliterate(input string) string {
 	// Сначала нормализуем строку
 	transformer := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
-	result, _, _ := transform.String(transformer, input)
+	normalized, _, _ := transform.String(transformer, input)
 
 	// Словарь транслитерации
 	transliterationMap := map[rune]string{
@@ -38,7 +38,7 @@ func (t *Transliterator) Transliterate(input string) string {
 	}
 
 	var result strings.Builder
-	for _, r := range result {
+	for _, r := range normalized {
 		if replacement, exists := transliterationMap[r]; exists {
 			result.WriteString(replacement)
 		} else if unicode.IsLetter(r) || unicode.IsDigit(r) {
