@@ -13,8 +13,8 @@ func TestTransliteration(t *testing.T) {
 	}{
 		{"Пользователи", "polzovateli"},
 		{"Дата создания", "data_sozdaniya"},
-		{"Системный номер", "system_number"},
-		{"Тестовая таблица", "testovaya_tablica"},
+		{"Системный номер", "sistemnyi_nomer"},
+		{"Тестовая таблица", "testovaya_tablitsa"},
 		{"", ""},
 		{"123", "123"},
 		{"test", "test"},

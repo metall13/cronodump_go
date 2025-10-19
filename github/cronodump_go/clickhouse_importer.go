@@ -117,23 +117,23 @@ func (i *ClickHouseImporter) insertData(ctx context.Context, table CronosTable) 
 	batchSize := i.config.BatchSize
 	totalRecords := len(table.Records)
 
-	for i := 0; i < totalRecords; i += batchSize {
-		end := i + batchSize
+	for j := 0; j < totalRecords; j += batchSize {
+		end := j + batchSize
 		if end > totalRecords {
 			end = totalRecords
 		}
 
-		batch := table.Records[i:end]
+		batch := table.Records[j:end]
 		insertSQL := exporter.generateInsertSQL(table, batch)
 
 		if i.verbose && len(batch) > 0 {
-			fmt.Printf("  Вставляем записи: %d-%d из %d\n", i+1, end, totalRecords)
+			fmt.Printf("  Вставляем записи: %d-%d из %d\n", j+1, end, totalRecords)
 		}
 
 		// Выполняем вставку
 		err := i.conn.Exec(ctx, insertSQL)
 		if err != nil {
-			return fmt.Errorf("ошибка вставки батча %d-%d: %v", i+1, end, err)
+			return fmt.Errorf("ошибка вставки батча %d-%d: %v", j+1, end, err)
 		}
 	}
 
